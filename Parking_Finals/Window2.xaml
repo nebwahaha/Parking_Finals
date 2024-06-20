@@ -1,0 +1,28 @@
+﻿<Window x:Class="Parking_Finals.Window2"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Parking_Finals"
+        mc:Ignorable="d"
+        Title="Window2" Height="450" Width="800">
+    <Grid>
+        <TextBox x:Name="UsernameTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="10,10,0,0" Width="150" />
+        <TextBox x:Name="StaffIDTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="10,38,0,0" Width="150" />
+        <TextBox x:Name="ParkingCapacity" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="10,93,0,0" Width="65" />
+        <TextBox x:Name="AvailableSlot" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="95,93,0,0" Width="65" />
+        <TextBox x:Name="PlateNumberTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="10,121,0,0" Width="150"/>
+        <TextBox x:Name="CustomerNameTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="10,149,0,0" Width="150" />
+        <TextBox x:Name="ContactNumberTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="10,177,0,0" Width="150"/>
+        <TextBox x:Name="DateTimeTextBox" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16" Margin="0,10,0,0" Width="175" IsReadOnly="True"/>
+
+        <Button Content="Exit" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="30" Margin="10,205,0,0" Click="ExitButton_Click"/>
+
+        <Image x:Name="videoImage" Margin="411,126,35,126" />
+
+        <ComboBox x:Name="ParkingAreaDrop" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,66,0,0" Width="150" SelectionChanged="ParkingAreaDrop_SelectionChanged"/>
+        <ComboBox x:Name="ParkingTypeDrop" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,240,0,0" Width="150"/>
+
+        <Button Content="Confirm" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="30" Margin="10,275,0,0" Click="ConfirmButton_Click"/>
+    </Grid>
+</Window>
