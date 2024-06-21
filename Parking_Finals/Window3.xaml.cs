@@ -19,7 +19,7 @@ namespace Parking_Finals
     {
         private string _username;
         private string _staffID;
-        private mallparkingDataContext _lsDC; // Assuming this is your data context
+        private mallparkingDataContext _lsDC;
 
         public Window3(string username, string staffID)
         {
@@ -36,12 +36,10 @@ namespace Parking_Finals
 
             if (!string.IsNullOrWhiteSpace(plateNumber))
             {
-                // Perform search by Plate_Number
                 SearchByPlateNumber(plateNumber);
             }
             else if (!string.IsNullOrWhiteSpace(receiptId))
             {
-                // Perform search by Receipt_ID
                 SearchByReceiptID(receiptId);
             }
             else
@@ -52,22 +50,17 @@ namespace Parking_Finals
 
         private void SearchByPlateNumber(string plateNumber)
         {
-            // Find the Plate_Number record
             var plate = _lsDC.Plate_Numbers.FirstOrDefault(p => p.Plate_Number1 == plateNumber);
             if (plate != null)
             {
-                // Retrieve the associated Customer
                 var customer = _lsDC.Customers.FirstOrDefault(c => c.Plate_Number == plateNumber);
                 if (customer != null)
                 {
-                    // Display customer details
                     DisplayCustomerDetails(customer, plateNumber);
 
-                    // Find the Receipt associated with the customer
                     var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == customer.Receipt_ID);
                     if (receipt != null)
                     {
-                        // Display receipt details
                         DisplayReceiptDetails(customer, receipt);
                     }
                     else
@@ -92,11 +85,9 @@ namespace Parking_Finals
 
         private void SearchByReceiptID(string receiptId)
         {
-            // Find the Customer based on Receipt_ID
             var customer = _lsDC.Customers.FirstOrDefault(c => c.Receipt_ID == receiptId);
             if (customer != null)
             {
-                // Find the Receipt based on Receipt_ID
                 var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == receiptId);
                 if (receipt != null)
                 {
@@ -134,15 +125,12 @@ namespace Parking_Finals
             CustomerNameTextBox.Text = customer.Customer_Name;
             ContactNumberTextBox.Text = customer.Contact_Number;
 
-            // Display receipt-specific fields
-            TimeInTextBox.Text = receipt.Time_IN.ToString(); // Assuming Time_IN is a DateTime field
-            ParkingAreaIDTextBox.Text = receipt.ParkingArea_ID.ToString(); // Assuming ParkingArea_ID is an integer
+            TimeInTextBox.Text = receipt.Time_IN.ToString();
+            ParkingAreaIDTextBox.Text = receipt.ParkingArea_ID.ToString();
             ParkingStatusTextBox.Text = receipt.Parking_Status;
 
-            // Set the current date and time in TimeOutTextBox
             TimeOutTextBox.Text = DateTime.Now.ToString();
 
-            // Display car photo
             DisplayCarPhoto(customer.Plate_Number);
         }
 
@@ -156,10 +144,10 @@ namespace Parking_Finals
         private void ClearReceiptDetails()
         {
             TimeInTextBox.Text = string.Empty;
-            TimeOutTextBox.Text = string.Empty; // Clear the TimeOutTextBox
+            TimeOutTextBox.Text = string.Empty;
             ParkingAreaIDTextBox.Text = string.Empty;
             ParkingStatusTextBox.Text = string.Empty;
-            CarPhotoImage.Source = null; // Clear the image display
+            CarPhotoImage.Source = null;
         }
 
         private void DisplayCarPhoto(string plateNumber)
@@ -168,10 +156,8 @@ namespace Parking_Finals
             var plate = _lsDC.Plate_Numbers.FirstOrDefault(p => p.Plate_Number1 == plateNumber);
             if (plate != null)
             {
-                // Display Car_Photo associated with the Plate_Number
                 try
                 {
-                    // Check if the file exists using System.IO.File.Exists
                     if (System.IO.File.Exists(plate.Car_Photo))
                     {
                         BitmapImage bitmap = new BitmapImage();

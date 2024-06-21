@@ -27,7 +27,7 @@ namespace Parking_Finals
         private VideoCaptureDevice videoSource;
         private mallparkingDataContext _lsDC;
         private DispatcherTimer timer;
-        private System.Drawing.Bitmap currentFrame; // Add this field to store the current frame
+        private System.Drawing.Bitmap currentFrame;
 
         public Window2(string username, string staffID)
         {
@@ -41,7 +41,6 @@ namespace Parking_Finals
 
             this.Closed += Window2_Closed;
 
-            // Initialize the timer
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += Timer_Tick;
@@ -69,7 +68,7 @@ namespace Parking_Finals
 
         private void VideoSource_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
-            currentFrame?.Dispose(); // Dispose the previous frame if exists
+            currentFrame?.Dispose();
             currentFrame = (System.Drawing.Bitmap)eventArgs.Frame.Clone();
 
             using (var bitmap = (System.Drawing.Bitmap)currentFrame.Clone())
@@ -105,8 +104,8 @@ namespace Parking_Finals
                                select new { pa.ParkingArea_ID, pa.ParkingArea_Location };
 
             ParkingAreaDrop.ItemsSource = parkingAreas.ToList();
-            ParkingAreaDrop.DisplayMemberPath = "ParkingArea_Location"; // Display the location
-            ParkingAreaDrop.SelectedValuePath = "ParkingArea_ID"; // Use the ID as the selected value
+            ParkingAreaDrop.DisplayMemberPath = "ParkingArea_Location";
+            ParkingAreaDrop.SelectedValuePath = "ParkingArea_ID";
         }
 
         private void PopulateParkingTypeComboBox()
@@ -327,7 +326,7 @@ namespace Parking_Finals
 
                 currentFrame.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
                 MessageBox.Show($"Image saved to {filePath}");
-                return filePath; // Return the file path
+                return filePath;
             }
             catch (Exception ex)
             {
