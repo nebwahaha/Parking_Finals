@@ -38,5 +38,12 @@ namespace Parking_Finals
             window2.Show();
             this.Close();
         }
+
+        private void ExitBoothButton_Click(object sender, RoutedEventArgs e)
+        {
+            Window3 window3 = new Window3(_username, _staffID);
+            window3.Show();
+            this.Close();
+        }
     }
 }

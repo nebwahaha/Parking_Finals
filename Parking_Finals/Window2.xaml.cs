@@ -102,9 +102,11 @@ namespace Parking_Finals
         private void PopulateComboBox()
         {
             var parkingAreas = from pa in _lsDC.ParkingAreas
-                               select pa.ParkingArea_Location;
+                               select new { pa.ParkingArea_ID, pa.ParkingArea_Location };
 
             ParkingAreaDrop.ItemsSource = parkingAreas.ToList();
+            ParkingAreaDrop.DisplayMemberPath = "ParkingArea_Location"; // Display the location
+            ParkingAreaDrop.SelectedValuePath = "ParkingArea_ID"; // Use the ID as the selected value
         }
 
         private void PopulateParkingTypeComboBox()
@@ -117,10 +119,10 @@ namespace Parking_Finals
         {
             if (ParkingAreaDrop.SelectedItem != null)
             {
-                string selectedLocation = ParkingAreaDrop.SelectedItem.ToString();
+                string selectedId = ParkingAreaDrop.SelectedValue as string;
 
                 var selectedParkingArea = (from pa in _lsDC.ParkingAreas
-                                           where pa.ParkingArea_Location == selectedLocation
+                                           where pa.ParkingArea_ID == selectedId
                                            select pa).FirstOrDefault();
 
                 if (selectedParkingArea != null)
@@ -188,7 +190,7 @@ namespace Parking_Finals
             }
         }
 
-        private void InsertCustomer(string customerId, string plateNumber, string customerName, string contactNumber)
+        private void InsertCustomer(string customerId, string plateNumber, string customerName, string contactNumber, string receiptId)
         {
             try
             {
@@ -197,7 +199,8 @@ namespace Parking_Finals
                     Customer_ID = customerId,
                     Plate_Number = plateNumber,
                     Customer_Name = string.IsNullOrEmpty(customerName) ? null : customerName,
-                    Contact_Number = string.IsNullOrEmpty(contactNumber) ? null : contactNumber
+                    Contact_Number = string.IsNullOrEmpty(contactNumber) ? null : contactNumber,
+                    Receipt_ID = receiptId
                 };
                 _lsDC.Customers.InsertOnSubmit(newCustomer);
                 _lsDC.SubmitChanges();
@@ -207,6 +210,7 @@ namespace Parking_Finals
                 MessageBox.Show($"Error inserting customer: {ex.Message}");
             }
         }
+
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
@@ -218,20 +222,89 @@ namespace Parking_Finals
                 return;
             }
 
+            if (ParkingAreaDrop.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a parking area.");
+                return;
+            }
+
+            if (ParkingTypeDrop.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a parking type.");
+                return;
+            }
+
             string customerId = GenerateCustomerID();
+            string receiptId = GenerateReceiptID();
             string customerName = CustomerNameTextBox.Text;
             string contactNumber = ContactNumberTextBox.Text;
+            DateTime timeIn = DateTime.Now;
 
-            string carPhotoPath = SaveCurrentFrame(plateNumber); // Save the current frame and get the file path
+            string parkingAreaId = ParkingAreaDrop.SelectedValue as string;
+            string parkingStatus = ParkingTypeDrop.SelectedItem.ToString();
 
-            if (carPhotoPath != null)
+            var selectedParkingArea = _lsDC.ParkingAreas.FirstOrDefault(pa => pa.ParkingArea_ID == parkingAreaId);
+
+            if (selectedParkingArea != null)
             {
-                InsertPlateNumber(plateNumber, carPhotoPath);
-                InsertCustomer(customerId, plateNumber, customerName, contactNumber);
+                if (selectedParkingArea.Available_Slot <= 0)
+                {
+                    MessageBox.Show("No available slots.");
+                    return;
+                }
 
-                MessageBox.Show("Data saved successfully!");
+                selectedParkingArea.Available_Slot -= 1;
+                _lsDC.SubmitChanges();
+
+                string carPhotoPath = SaveCurrentFrame(plateNumber);
+                if (carPhotoPath != null)
+                {
+                    InsertPlateNumber(plateNumber, carPhotoPath);
+                    InsertReceipt(receiptId, timeIn, parkingAreaId, parkingStatus);
+                    InsertCustomer(customerId, plateNumber, customerName, contactNumber, receiptId);
+
+                    MessageBox.Show("Data saved successfully!");
+                }
+                AvailableSlot.Text = selectedParkingArea.Available_Slot.ToString();
             }
         }
+
+
+
+        private string GenerateReceiptID()
+        {
+            var lastReceipt = _lsDC.Receipts
+                                   .OrderByDescending(r => r.Receipt_ID)
+                                   .FirstOrDefault();
+            int newIdNumber = 1;
+            if (lastReceipt != null)
+            {
+                string lastId = lastReceipt.Receipt_ID;
+                newIdNumber = int.Parse(lastId.Substring(3)) + 1;
+            }
+            return "RID" + newIdNumber;
+        }
+
+        private void InsertReceipt(string receiptId, DateTime timeIn, string parkingAreaId, string parkingStatus)
+        {
+            try
+            {
+                var newReceipt = new Receipt
+                {
+                    Receipt_ID = receiptId,
+                    Time_IN = timeIn, 
+                    ParkingArea_ID = parkingAreaId, 
+                    Parking_Status = parkingStatus 
+                };
+                _lsDC.Receipts.InsertOnSubmit(newReceipt);
+                _lsDC.SubmitChanges();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error inserting receipt: {ex.Message}");
+            }
+        }
+
 
         private string SaveCurrentFrame(string plateNumber)
         {
@@ -243,8 +316,7 @@ namespace Parking_Finals
                     return null;
                 }
 
-                // Specify the directory where you want to save the image
-                string directoryPath = "C:\\Users\\Benjamin\\Documents\\CarPhoto"; // Edit this path as needed
+                string directoryPath = "C:\\Users\\Benjamin\\Documents\\CarPhoto";
                 if (!System.IO.Directory.Exists(directoryPath))
                 {
                     System.IO.Directory.CreateDirectory(directoryPath);
