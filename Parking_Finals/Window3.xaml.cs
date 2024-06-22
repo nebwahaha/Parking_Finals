@@ -48,6 +48,14 @@ namespace Parking_Finals
             }
         }
 
+        private void TextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                SearchButton_Click(sender, e);
+            }
+        }
+
         private void SearchByPlateNumber(string plateNumber)
         {
             var plate = _lsDC.Plate_Numbers.FirstOrDefault(p => p.Plate_Number1 == plateNumber);
@@ -82,7 +90,6 @@ namespace Parking_Finals
             }
         }
 
-
         private void SearchByReceiptID(string receiptId)
         {
             var customer = _lsDC.Customers.FirstOrDefault(c => c.Receipt_ID == receiptId);
@@ -114,9 +121,7 @@ namespace Parking_Finals
             ReceiptIDTextBox.Text = customer.Receipt_ID;
             CustomerNameTextBox.Text = customer.Customer_Name;
             ContactNumberTextBox.Text = customer.Contact_Number;
-
         }
-
 
         private void DisplayReceiptDetails(Customer customer, Receipt receipt)
         {
@@ -125,13 +130,55 @@ namespace Parking_Finals
             CustomerNameTextBox.Text = customer.Customer_Name;
             ContactNumberTextBox.Text = customer.Contact_Number;
 
-            TimeInTextBox.Text = receipt.Time_IN.ToString();
-            ParkingAreaIDTextBox.Text = receipt.ParkingArea_ID.ToString();
-            ParkingStatusTextBox.Text = receipt.Parking_Status;
+            if (receipt.Time_IN.HasValue)
+            {
+                DateTime timeIn = receipt.Time_IN.Value;
+                DateTime timeOut = DateTime.Now;
+                TimeInTextBox.Text = timeIn.ToString();
+                TimeOutTextBox.Text = timeOut.ToString();
 
-            TimeOutTextBox.Text = DateTime.Now.ToString();
+                // Calculate parking duration
+                TimeSpan duration = timeOut - timeIn;
 
-            DisplayCarPhoto(customer.Plate_Number);
+                // Determine the total amount and update parking status
+                decimal totalAmount;
+                if (duration.TotalHours <= 12)
+                {
+                    totalAmount = 30m; // 30 PHP for up to 12 hours
+                }
+                else
+                {
+                    totalAmount = 300m; // 300 PHP for overnight parking
+                    ParkingStatusTextBox.Text = "Overnight"; // Update parking status in the UI
+                    receipt.Parking_Status = "Overnight"; // Update parking status in the receipt object
+                    _lsDC.SubmitChanges(); // Save changes to the database
+                }
+
+                TotalAmount.Text = totalAmount.ToString("F2"); // Display total amount
+
+                // Display ParkingArea_ID
+                ParkingAreaIDTextBox.Text = receipt.ParkingArea_ID.ToString();
+
+                DisplayCarPhoto(customer.Plate_Number);
+            }
+            else
+            {
+                MessageBox.Show("Time IN is not available.");
+            }
+        }
+
+        private void PaymentInputTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (decimal.TryParse(TotalAmount.Text, out decimal totalAmount) &&
+                decimal.TryParse(PaymentInputTextBox.Text, out decimal paymentAmount))
+            {
+                decimal change = paymentAmount - totalAmount;
+                ChangeTextBox.Text = change.ToString("F2");
+            }
+            else
+            {
+                ChangeTextBox.Text = string.Empty;
+            }
         }
 
         private void ClearCustomerDetails()
@@ -147,12 +194,14 @@ namespace Parking_Finals
             TimeOutTextBox.Text = string.Empty;
             ParkingAreaIDTextBox.Text = string.Empty;
             ParkingStatusTextBox.Text = string.Empty;
+            TotalAmount.Text = string.Empty;
+            PaymentInputTextBox.Text = string.Empty; // Clear payment input
+            ChangeTextBox.Text = string.Empty; // Clear change display
             CarPhotoImage.Source = null;
         }
 
         private void DisplayCarPhoto(string plateNumber)
         {
-            // Find the Plate_Number record
             var plate = _lsDC.Plate_Numbers.FirstOrDefault(p => p.Plate_Number1 == plateNumber);
             if (plate != null)
             {
