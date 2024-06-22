@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 
 namespace Parking_Finals
 {
@@ -20,6 +21,8 @@ namespace Parking_Finals
         private string _username;
         private string _staffID;
         private mallparkingDataContext _lsDC;
+        private bool _isLostTicket = false;
+
 
         public Window3(string username, string staffID)
         {
@@ -56,24 +59,158 @@ namespace Parking_Finals
             }
         }
 
-        private void SearchByPlateNumber(string plateNumber)
+        private void LostTicketButton_Click(object sender, RoutedEventArgs e)
         {
-            var plate = _lsDC.Plate_Numbers.FirstOrDefault(p => p.Plate_Number1 == plateNumber);
-            if (plate != null)
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Image files (*.jpeg;*.png)|*.jpeg;*.png";
+
+            bool? result = openFileDialog.ShowDialog();
+            if (result == true)
+            {
+                string selectedFileName = openFileDialog.FileName;
+                UpdateCustomerORCR(selectedFileName);
+
+                // Set the lost ticket flag
+                _isLostTicket = true;
+
+                // Update the total amount with the lost ticket fee
+                if (decimal.TryParse(TotalAmount.Text, out decimal totalAmount))
+                {
+                    totalAmount += 200m; // Add 200 pesos for lost ticket fee
+                    TotalAmount.Text = totalAmount.ToString("F2");
+                }
+            }
+        }
+
+
+        private void UpdateCustomerORCR(string filePath)
+        {
+            // Assuming the PlateNumberTextBox contains the plate number of the current customer
+            string plateNumber = PlateNumberTextBox.Text.Trim();
+            if (!string.IsNullOrEmpty(plateNumber))
             {
                 var customer = _lsDC.Customers.FirstOrDefault(c => c.Plate_Number == plateNumber);
                 if (customer != null)
                 {
-                    DisplayCustomerDetails(customer, plateNumber);
+                    customer.OR_CR = filePath;
+                    _lsDC.SubmitChanges();
+                    MessageBox.Show("Photo path saved successfully.");
+                }
+                else
+                {
+                    MessageBox.Show("Customer not found.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please enter a Plate Number.");
+            }
+        }
 
-                    var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == customer.Receipt_ID);
+        private void PayCashButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (decimal.TryParse(TotalAmount.Text, out decimal totalAmount) &&
+                decimal.TryParse(PaymentInputTextBox.Text, out decimal paymentAmount))
+            {
+                decimal change = paymentAmount - totalAmount;
+                if (change >= 0)
+                {
+                    var receiptId = ReceiptIDTextBox.Text.Trim();
+                    var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == receiptId);
                     if (receipt != null)
                     {
+                        receipt.Payment_Method = "Cash";
+                        receipt.Payment_Status = "Paid";
+                        receipt.Total_Amount = totalAmount;
+                        receipt.Change_Amount = change;
+                        receipt.Staff_ID = _staffID;
+                        receipt.Time_Out = DateTime.Now;
+
+                        var parkingArea = _lsDC.ParkingAreas.FirstOrDefault(p => p.ParkingArea_ID == receipt.ParkingArea_ID);
+                        if (parkingArea != null && parkingArea.Available_Slot < 100)
+                        {
+                            parkingArea.Available_Slot = Math.Min(parkingArea.Available_Slot + 1, 100);
+                        }
+
+                        _lsDC.SubmitChanges();
+                        MessageBox.Show("Cash payment successful.");
+
+                        // Clear the input fields after payment
+                        ClearInputFields();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Receipt not found.");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Insufficient payment amount.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Invalid payment amount.");
+            }
+        }
+
+        private void PayGCashButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (decimal.TryParse(TotalAmount.Text, out decimal totalAmount))
+            {
+                var receiptId = ReceiptIDTextBox.Text.Trim();
+                var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == receiptId);
+                if (receipt != null)
+                {
+                    receipt.Payment_Method = "GCash";
+                    receipt.Payment_Status = "Paid";
+                    receipt.Total_Amount = totalAmount;
+                    receipt.Change_Amount = 0m;
+                    receipt.Staff_ID = _staffID;
+                    receipt.Time_Out = DateTime.Now;
+
+                    var parkingArea = _lsDC.ParkingAreas.FirstOrDefault(p => p.ParkingArea_ID == receipt.ParkingArea_ID);
+                    if (parkingArea != null && parkingArea.Available_Slot < 100)
+                    {
+                        parkingArea.Available_Slot = Math.Min(parkingArea.Available_Slot + 1, 100);
+                    }
+
+                    _lsDC.SubmitChanges();
+                    MessageBox.Show("GCash payment successful.");
+
+                    // Clear the input fields after payment
+                    ClearInputFields();
+                }
+                else
+                {
+                    MessageBox.Show("Receipt not found.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Invalid total amount.");
+            }
+        }
+
+        private void SearchByPlateNumber(string plateNumber)
+        {
+            var plates = _lsDC.Plate_Numbers.Where(p => p.Plate_Number1.StartsWith(plateNumber)).ToList();
+
+            if (plates.Count == 1)
+            {
+                var customer = _lsDC.Customers.FirstOrDefault(c => c.Plate_Number == plates[0].Plate_Number1);
+                if (customer != null)
+                {
+                    var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == customer.Receipt_ID && r.Payment_Status != "Paid");
+                    if (receipt != null)
+                    {
+                        DisplayCustomerDetails(customer, plates[0].Plate_Number1);
                         DisplayReceiptDetails(customer, receipt);
                     }
                     else
                     {
-                        MessageBox.Show($"Receipt for Customer with Plate Number '{plateNumber}' not found.");
+                        MessageBox.Show($"No unpaid receipt found for Customer with Plate Number '{plateNumber}'.");
+                        ClearCustomerDetails();
                         ClearReceiptDetails();
                     }
                 }
@@ -83,6 +220,12 @@ namespace Parking_Finals
                     ClearCustomerDetails();
                 }
             }
+            else if (plates.Count > 1)
+            {
+                MessageBox.Show($"Multiple entries found for Plate Number '{plateNumber}'. Please search by Receipt ID instead.");
+                ClearCustomerDetails();
+                PlateNumberTextBox.Clear();
+            }
             else
             {
                 MessageBox.Show($"Plate Number '{plateNumber}' not found.");
@@ -90,19 +233,22 @@ namespace Parking_Finals
             }
         }
 
+
+
+
         private void SearchByReceiptID(string receiptId)
         {
             var customer = _lsDC.Customers.FirstOrDefault(c => c.Receipt_ID == receiptId);
             if (customer != null)
             {
-                var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == receiptId);
+                var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == receiptId && r.Payment_Status != "Paid");
                 if (receipt != null)
                 {
                     DisplayReceiptDetails(customer, receipt);
                 }
                 else
                 {
-                    MessageBox.Show($"Receipt with ID '{receiptId}' not found.");
+                    MessageBox.Show($"No unpaid receipt found with ID '{receiptId}'.");
                     ClearCustomerDetails();
                     ClearReceiptDetails();
                 }
@@ -125,6 +271,8 @@ namespace Parking_Finals
 
         private void DisplayReceiptDetails(Customer customer, Receipt receipt)
         {
+            _isLostTicket = false; // Reset the lost ticket flag
+
             PlateNumberTextBox.Text = customer.Plate_Number;
             ReceiptIDTextBox.Text = customer.Receipt_ID;
             CustomerNameTextBox.Text = customer.Customer_Name;
@@ -166,6 +314,7 @@ namespace Parking_Finals
                 MessageBox.Show("Time IN is not available.");
             }
         }
+
 
         private void PaymentInputTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -231,5 +380,22 @@ namespace Parking_Finals
                 ClearReceiptDetails();
             }
         }
+
+        private void ClearInputFields()
+        {
+            PlateNumberTextBox.Clear();
+            ReceiptIDTextBox.Clear();
+            CustomerNameTextBox.Clear();
+            ContactNumberTextBox.Clear();
+            TimeInTextBox.Clear();
+            TimeOutTextBox.Clear();
+            ParkingAreaIDTextBox.Clear();
+            ParkingStatusTextBox.Clear();
+            TotalAmount.Clear();
+            PaymentInputTextBox.Clear();
+            ChangeTextBox.Clear();
+            CarPhotoImage.Source = null;
+        }
+
     }
 }

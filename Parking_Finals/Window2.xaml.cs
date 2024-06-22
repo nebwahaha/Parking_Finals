@@ -175,11 +175,14 @@ namespace Parking_Finals
         {
             try
             {
+                string uniquePlateNumber = GenerateUniquePlateNumber(plateNumber);
+
                 var newPlateNumber = new Plate_Number
                 {
-                    Plate_Number1 = plateNumber,
+                    Plate_Number1 = uniquePlateNumber,
                     Car_Photo = carPhotoPath
                 };
+
                 _lsDC.Plate_Numbers.InsertOnSubmit(newPlateNumber);
                 _lsDC.SubmitChanges();
             }
@@ -188,6 +191,7 @@ namespace Parking_Finals
                 MessageBox.Show($"Error inserting plate number: {ex.Message}");
             }
         }
+
 
         private void InsertCustomer(string customerId, string plateNumber, string customerName, string contactNumber, string receiptId)
         {
@@ -213,7 +217,7 @@ namespace Parking_Finals
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
-            string plateNumber = PlateNumberTextBox.Text;
+            string plateNumber = PlateNumberTextBox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(plateNumber))
             {
@@ -235,8 +239,8 @@ namespace Parking_Finals
 
             string customerId = GenerateCustomerID();
             string receiptId = GenerateReceiptID();
-            string customerName = CustomerNameTextBox.Text;
-            string contactNumber = ContactNumberTextBox.Text;
+            string customerName = CustomerNameTextBox.Text.Trim();
+            string contactNumber = ContactNumberTextBox.Text.Trim();
             DateTime timeIn = DateTime.Now;
 
             string parkingAreaId = ParkingAreaDrop.SelectedValue as string;
@@ -263,7 +267,11 @@ namespace Parking_Finals
                     InsertCustomer(customerId, plateNumber, customerName, contactNumber, receiptId);
 
                     MessageBox.Show("Data saved successfully!");
+
+                    // Clear the input fields
+                    ClearInputFields();
                 }
+
                 AvailableSlot.Text = selectedParkingArea.Available_Slot.ToString();
             }
         }
@@ -284,6 +292,20 @@ namespace Parking_Finals
             return "RID" + newIdNumber;
         }
 
+        private string GenerateUniquePlateNumber(string basePlateNumber)
+        {
+            int counter = 1;
+            string uniquePlateNumber = basePlateNumber;
+
+            while (_lsDC.Plate_Numbers.Any(p => p.Plate_Number1 == uniquePlateNumber))
+            {
+                uniquePlateNumber = $"{basePlateNumber}_{counter}";
+                counter++;
+            }
+
+            return uniquePlateNumber;
+        }
+
         private void InsertReceipt(string receiptId, DateTime timeIn, string parkingAreaId, string parkingStatus)
         {
             try
@@ -291,9 +313,10 @@ namespace Parking_Finals
                 var newReceipt = new Receipt
                 {
                     Receipt_ID = receiptId,
-                    Time_IN = timeIn, 
-                    ParkingArea_ID = parkingAreaId, 
-                    Parking_Status = parkingStatus 
+                    Time_IN = timeIn,
+                    ParkingArea_ID = parkingAreaId,
+                    Parking_Status = parkingStatus,
+                    Payment_Status = "Unpaid" // Setting Payment_Status to Unpaid
                 };
                 _lsDC.Receipts.InsertOnSubmit(newReceipt);
                 _lsDC.SubmitChanges();
@@ -350,5 +373,14 @@ namespace Parking_Finals
 
             return fileName;
         }
+        private void ClearInputFields()
+        {
+            PlateNumberTextBox.Clear();
+            CustomerNameTextBox.Clear();
+            ContactNumberTextBox.Clear();
+            // Clear other textboxes if needed
+        }
+
+
     }
 }
