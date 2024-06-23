@@ -175,7 +175,8 @@ namespace Parking_Finals
         {
             try
             {
-                string uniquePlateNumber = GenerateUniquePlateNumber(plateNumber);
+                string upperPlateNumber = plateNumber.ToUpper(); // Convert to uppercase
+                string uniquePlateNumber = GenerateUniquePlateNumber(upperPlateNumber);
 
                 var newPlateNumber = new Plate_Number
                 {
@@ -200,7 +201,7 @@ namespace Parking_Finals
                 var newCustomer = new Customer
                 {
                     Customer_ID = customerId,
-                    Plate_Number = plateNumber,
+                    Plate_Number = plateNumber.ToUpper(), // Convert to uppercase
                     Customer_Name = string.IsNullOrEmpty(customerName) ? null : customerName,
                     Contact_Number = string.IsNullOrEmpty(contactNumber) ? null : contactNumber,
                     Receipt_ID = receiptId
@@ -380,7 +381,5 @@ namespace Parking_Finals
             ContactNumberTextBox.Clear();
             // Clear other textboxes if needed
         }
-
-
     }
 }

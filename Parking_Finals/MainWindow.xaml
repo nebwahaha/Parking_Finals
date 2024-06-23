@@ -22,13 +22,13 @@
         <Label Content="Username:" Grid.Row="0" Grid.Column="0" Margin="10"/>
 
         <!-- Username TextBox -->
-        <TextBox Name="txtbusername" Grid.Row="0" Grid.Column="1" Margin="10"/>
+        <TextBox Name="txtbusername" Grid.Row="0" Grid.Column="1" Margin="10" KeyDown="txtbusername_KeyDown"/>
 
         <!-- Password Label -->
         <Label Content="Password:" Grid.Row="1" Grid.Column="0" Margin="10"/>
 
         <!-- Password TextBox -->
-        <PasswordBox Name="txtbpass" Grid.Row="1" Grid.Column="1" Margin="10"/>
+        <PasswordBox Name="txtbpass" Grid.Row="1" Grid.Column="1" Margin="10" KeyDown="txtbpass_KeyDown"/>
 
         <!-- Login Button -->
         <Button Content="Login" Grid.Row="2" Grid.Column="0" Margin="10" Click="btnLogin_Click"/>

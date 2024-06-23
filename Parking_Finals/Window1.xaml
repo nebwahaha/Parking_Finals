@@ -8,7 +8,7 @@
         Title="Window1" Height="450" Width="800">
     <Grid>
         <Button Content="Entrance booth" HorizontalAlignment="Left" VerticalAlignment="Top" Height="100" Width="200" Margin="150,175,0,0" Click="EntranceBoothButton_Click"/>
-        
         <Button Content="Exit booth" HorizontalAlignment="Right" VerticalAlignment="Top" Height="100" Width="200" Margin="0,175,150,0" Click="ExitBoothButton_Click"/>
+        <Button x:Name="AdminButton" Content="View Logs" HorizontalAlignment="Center" VerticalAlignment="Top" Height="100" Width="200" Margin="0,300,0,0" Click="AdminButton_Click" Visibility="Collapsed"/>
     </Grid>
 </Window>

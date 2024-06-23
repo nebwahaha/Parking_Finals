@@ -65,5 +65,21 @@ namespace Parking_Finals
                 MessageBox.Show("Username and password are incorrect");
             }
         }
+
+        private void txtbusername_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                txtbpass.Focus();
+            }
+        }
+
+        private void txtbpass_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                btnLogin_Click(sender, e);
+            }
+        }
     }
 }
