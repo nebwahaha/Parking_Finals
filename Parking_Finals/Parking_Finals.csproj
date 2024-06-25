@@ -170,5 +170,26 @@
       <Version>4.3.0</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="sm login bg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="sm logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="log-out %282%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="entranceexit bg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="user.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="circle-chevron-left.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="log-out %283%29.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

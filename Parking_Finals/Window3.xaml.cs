@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.IO;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -12,10 +12,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Microsoft.Win32;
 
 namespace Parking_Finals
 {
+    /// <summary>
+    /// Interaction logic for Window3.xaml
+    /// </summary>
     public partial class Window3 : Window
     {
         private string _username;
@@ -30,6 +32,8 @@ namespace Parking_Finals
             _username = username;
             _staffID = staffID;
             _lsDC = new mallparkingDataContext(Properties.Settings.Default.mallparkingConnectionString);
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
@@ -79,8 +83,31 @@ namespace Parking_Finals
                     totalAmount += 200m; // Add 200 pesos for lost ticket fee
                     TotalAmount.Text = totalAmount.ToString("F2");
                 }
+
+                // Update parking status to include (Lost Ticket) in the Receipts table
+                var receiptId = ReceiptIDTextBox.Text.Trim();
+                var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == receiptId);
+                if (receipt != null)
+                {
+                    if (!receipt.Parking_Status.Contains("(Lost Ticket)"))
+                    {
+                        receipt.Parking_Status += " (Lost Ticket)";
+                        _lsDC.SubmitChanges();
+                        MessageBox.Show("Parking status updated to include (Lost Ticket).");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Parking status already contains (Lost Ticket).");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Receipt not found.");
+                }
             }
         }
+
+
 
 
         private void UpdateCustomerORCR(string filePath)
@@ -204,8 +231,7 @@ namespace Parking_Finals
                     var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == customer.Receipt_ID && r.Payment_Status != "Paid");
                     if (receipt != null)
                     {
-                        DisplayCustomerDetails(customer, plates[0].Plate_Number1);
-                        DisplayReceiptDetails(customer, receipt);
+                        DisplayReceiptDetails(customer.Receipt_ID); // Pass receipt ID as search term
                     }
                     else
                     {
@@ -244,7 +270,7 @@ namespace Parking_Finals
                 var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == receiptId && r.Payment_Status != "Paid");
                 if (receipt != null)
                 {
-                    DisplayReceiptDetails(customer, receipt);
+                    DisplayReceiptDetails(receiptId); // Pass receipt ID as search term
                 }
                 else
                 {
@@ -260,7 +286,6 @@ namespace Parking_Finals
                 ClearReceiptDetails();
             }
         }
-
         private void DisplayCustomerDetails(Customer customer, string plateNumber)
         {
             PlateNumberTextBox.Text = customer.Plate_Number;
@@ -269,52 +294,86 @@ namespace Parking_Finals
             ContactNumberTextBox.Text = customer.Contact_Number;
         }
 
-        private void DisplayReceiptDetails(Customer customer, Receipt receipt)
+        private void ClearButtonClick(object sender, RoutedEventArgs e)
+        {
+            // Clear the PlateNumberTextBox and ReceiptIDTextBox
+            PlateNumberTextBox.Clear();
+            ReceiptIDTextBox.Clear();
+
+            // Optionally, clear other fields or reset UI as needed
+            ClearCustomerDetails();
+            ClearReceiptDetails();
+        }
+
+
+        private Customer SearchReceiptDetails(string searchTerm)
+        {
+            // Search in database or your data source for the receipt details
+            Customer foundCustomer = _lsDC.Customers.FirstOrDefault(c =>
+                c.Plate_Number == searchTerm || c.Receipt_ID == searchTerm);
+
+            return foundCustomer;
+        }
+
+        private void DisplayReceiptDetails(string searchTerm)
         {
             _isLostTicket = false; // Reset the lost ticket flag
 
-            PlateNumberTextBox.Text = customer.Plate_Number;
-            ReceiptIDTextBox.Text = customer.Receipt_ID;
-            CustomerNameTextBox.Text = customer.Customer_Name;
-            ContactNumberTextBox.Text = customer.Contact_Number;
-
-            if (receipt.Time_IN.HasValue)
+            // Search for receipt details based on the search term
+            Customer customer = SearchReceiptDetails(searchTerm);
+            if (customer != null)
             {
-                DateTime timeIn = receipt.Time_IN.Value;
-                DateTime timeOut = DateTime.Now;
-                TimeInTextBox.Text = timeIn.ToString();
-                TimeOutTextBox.Text = timeOut.ToString();
+                // Display found customer's details
+                PlateNumberTextBox.Text = customer.Plate_Number;
+                ReceiptIDTextBox.Text = customer.Receipt_ID;
+                CustomerNameTextBox.Text = customer.Customer_Name;
+                ContactNumberTextBox.Text = customer.Contact_Number;
 
-                // Calculate parking duration
-                TimeSpan duration = timeOut - timeIn;
-
-                // Determine the total amount and update parking status
-                decimal totalAmount;
-                if (duration.TotalHours <= 12)
+                // Fetch receipt details
+                Receipt receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == customer.Receipt_ID);
+                if (receipt != null && receipt.Time_IN.HasValue)
                 {
-                    totalAmount = 30m; // 30 PHP for up to 12 hours
+                    DateTime timeIn = receipt.Time_IN.Value;
+                    DateTime timeOut = DateTime.Now;
+                    TimeInTextBox.Text = timeIn.ToString();
+                    TimeOutTextBox.Text = timeOut.ToString();
+
+                    // Calculate parking duration
+                    TimeSpan duration = timeOut - timeIn;
+
+                    // Calculate total amount based on parking duration
+                    decimal totalAmount;
+                    if (duration.TotalHours <= 12)
+                    {
+                        totalAmount = 30m; // 30 PHP for up to 12 hours
+                    }
+                    else
+                    {
+                        int numberOfOvernightDays = (int)Math.Ceiling(duration.TotalDays) - 1;
+                        totalAmount = 300m + numberOfOvernightDays * 300m; // Base amount + additional days calculation
+                        receipt.Parking_Status = $"Overnight ({numberOfOvernightDays + 1} days)";
+                        receipt.Total_Amount = totalAmount;
+                        _lsDC.SubmitChanges(); // Save changes to the database
+                    }
+
+                    TotalAmount.Text = totalAmount.ToString("F2"); // Display total amount
+
+                    // Display other receipt information
+                    ParkingAreaIDTextBox.Text = receipt.ParkingArea_ID.ToString();
+                    ParkingStatusTextBox.Text = receipt.Parking_Status;
+
+                    DisplayCarPhoto(customer.Plate_Number);
                 }
                 else
                 {
-                    totalAmount = 300m; // 300 PHP for overnight parking
-                    ParkingStatusTextBox.Text = "Overnight"; // Update parking status in the UI
-                    receipt.Parking_Status = "Overnight"; // Update parking status in the receipt object
-                    _lsDC.SubmitChanges(); // Save changes to the database
+                    MessageBox.Show("No valid receipt found for the selected customer.");
                 }
-
-                TotalAmount.Text = totalAmount.ToString("F2"); // Display total amount
-
-                // Display ParkingArea_ID
-                ParkingAreaIDTextBox.Text = receipt.ParkingArea_ID.ToString();
-
-                DisplayCarPhoto(customer.Plate_Number);
             }
             else
             {
-                MessageBox.Show("Time IN is not available.");
+                MessageBox.Show("Customer not found.");
             }
         }
-
 
         private void PaymentInputTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -397,5 +456,18 @@ namespace Parking_Finals
             CarPhotoImage.Source = null;
         }
 
+        private void BackHomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Show confirmation dialog
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to go back?", "Confirm Back Home", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                // Navigate back to MainWindow
+                Window1 window1 = new Window1(_username, _staffID, _lsDC);
+                window1.Show();
+                this.Close();
+            }
+        }
     }
 }

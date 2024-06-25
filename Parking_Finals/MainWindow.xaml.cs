@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace Parking_Finals
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private mallparkingDataContext _lsDC = null;
@@ -29,6 +26,8 @@ namespace Parking_Finals
         {
             InitializeComponent();
             _lsDC = new mallparkingDataContext(Properties.Settings.Default.mallparkingConnectionString);
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
         }
 
         private void btnLogin_Click(object sender, RoutedEventArgs e)
@@ -55,7 +54,7 @@ namespace Parking_Finals
             }
             if (loginlog)
             {
-                MessageBox.Show($"Success! Welcome {username}");
+                //MessageBox.Show($"Success! Welcome {username}");
                 Window1 window1 = new Window1(username, _staffID, _lsDC);
                 window1.Show();
                 this.Close();

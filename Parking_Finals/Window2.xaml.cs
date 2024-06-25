@@ -28,11 +28,15 @@ namespace Parking_Finals
         private mallparkingDataContext _lsDC;
         private DispatcherTimer timer;
         private System.Drawing.Bitmap currentFrame;
+        private string _username;
+        private string _staffID;
 
         public Window2(string username, string staffID)
         {
             InitializeComponent();
             InitializeCamera();
+            _username = username;
+            _staffID = staffID;
             _lsDC = new mallparkingDataContext(Properties.Settings.Default.mallparkingConnectionString);
             UsernameTextBox.Text = username;
             StaffIDTextBox.Text = staffID;
@@ -45,6 +49,7 @@ namespace Parking_Finals
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += Timer_Tick;
             timer.Start();
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -175,8 +180,7 @@ namespace Parking_Finals
         {
             try
             {
-                string upperPlateNumber = plateNumber.ToUpper(); // Convert to uppercase
-                string uniquePlateNumber = GenerateUniquePlateNumber(upperPlateNumber);
+                string uniquePlateNumber = GenerateUniquePlateNumber(plateNumber);
 
                 var newPlateNumber = new Plate_Number
                 {
@@ -201,7 +205,7 @@ namespace Parking_Finals
                 var newCustomer = new Customer
                 {
                     Customer_ID = customerId,
-                    Plate_Number = plateNumber.ToUpper(), // Convert to uppercase
+                    Plate_Number = plateNumber,
                     Customer_Name = string.IsNullOrEmpty(customerName) ? null : customerName,
                     Contact_Number = string.IsNullOrEmpty(contactNumber) ? null : contactNumber,
                     Receipt_ID = receiptId
@@ -212,6 +216,22 @@ namespace Parking_Finals
             catch (Exception ex)
             {
                 MessageBox.Show($"Error inserting customer: {ex.Message}");
+            }
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to go back home? Changes will not be saved.", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                StopCamera();
+                timer.Stop();
+
+                // Navigate back to Window1
+                Window1 window1 = new Window1(_username, _staffID, _lsDC);  // Pass the necessary parameters to Window1 constructor
+                window1.Show();
+                this.Close();  // Close Window2
             }
         }
 
@@ -380,6 +400,33 @@ namespace Parking_Finals
             CustomerNameTextBox.Clear();
             ContactNumberTextBox.Clear();
             // Clear other textboxes if needed
+        }
+
+
+        private void ParkingTypeDrop_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ParkingTypeDrop.SelectedItem != null)
+            {
+                string selectedType = ParkingTypeDrop.SelectedItem.ToString();
+
+                if (selectedType == "Overnight Parking")
+                {
+                    CustomerNameTextBox.Visibility = Visibility.Visible;
+                    ContactNumberTextBox.Visibility = Visibility.Visible;
+                    CustomerNameLabel.Visibility = Visibility.Visible;
+                    ContactNumberLabel.Visibility = Visibility.Visible;
+
+
+                }
+                else if (selectedType == "Fix Rate")
+                {
+                    CustomerNameTextBox.Visibility = Visibility.Collapsed;
+                    ContactNumberTextBox.Visibility = Visibility.Collapsed;
+                    CustomerNameLabel.Visibility = Visibility.Collapsed;
+                    ContactNumberLabel.Visibility = Visibility.Collapsed;
+
+                }
+            }
         }
     }
 }

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.IO;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -12,7 +11,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Microsoft.Win32;
 
 namespace Parking_Finals
 {
@@ -28,6 +26,8 @@ namespace Parking_Finals
             _username = username;
             _staffID = staffID;
             _lsDC = lsDC;
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
         }
 
         private void TableSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -38,6 +38,9 @@ namespace Parking_Finals
                 Console.WriteLine($"Selected table: {selectedTable}");
                 DataGridView.Columns.Clear();
                 DataGridView.AutoGenerateColumns = true;
+                DataGridView.Visibility = Visibility.Visible;
+
+                NewEmployeeForm.Visibility = Visibility.Collapsed;
 
                 switch (selectedTable)
                 {
@@ -88,6 +91,7 @@ namespace Parking_Finals
 
         private void AddEmployeeButton_Click(object sender, RoutedEventArgs e)
         {
+            DataGridView.Visibility = Visibility.Collapsed;
             NewEmployeeForm.Visibility = Visibility.Visible;
         }
 
@@ -132,6 +136,12 @@ namespace Parking_Finals
             ClearEmployeeForm();
         }
 
+        private void HomeLogsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Window1 homeWindow = new Window1(_username, _staffID, _lsDC);
+            homeWindow.Show();
+            this.Close();
+        }
         private void ClearEmployeeForm()
         {
             StaffNameTextBox.Clear();
@@ -167,6 +177,19 @@ namespace Parking_Finals
                     _lsDC.SubmitChanges();
                     DataGridView.ItemsSource = _lsDC.Staffs.ToList(); // Refresh the grid
                 }
+            }
+        }
+        private void Logoutlog_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // Show confirmation dialog
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to log out?", "Confirm Logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                // Navigate back to MainWindow
+                MainWindow mainWindow = new MainWindow();
+                mainWindow.Show();
+                Close(); // Close the current Window4 instance
             }
         }
     }
