@@ -5,10 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Parking_Finals"
         mc:Ignorable="d"
-        Title="Window1" Height="450" Width="800">
+        Title="Parking Home" Height="460" Width="800">
     <Grid>
-        <Button Content="Entrance booth" HorizontalAlignment="Left" VerticalAlignment="Top" Height="100" Width="200" Margin="150,175,0,0" Click="EntranceBoothButton_Click"/>
+        <Grid.Background>
+            <ImageBrush ImageSource="/entranceexit bg.png"/>
+        </Grid.Background>
+        <Button Content="Entrance booth" HorizontalAlignment="Left" VerticalAlignment="Top" Height="130" Width="230" Margin="138,122,0,0" Click="EntranceBoothButton_Click" Background="#FF2C4B74" Foreground="White" FontFamily="Arial Black" FontSize="18" BorderBrush="Black" BorderThickness="3,3,3,3"/>
 
-        <Button Content="Exit booth" HorizontalAlignment="Right" VerticalAlignment="Top" Height="100" Width="200" Margin="0,175,150,0"/>
+        <Button Content="Exit booth" Click="ExitBoothButton_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Height="130" Width="228" Margin="424,122,0,0" Background="#FF2C4B74" FontFamily="Arial Black" FontSize="18" Foreground="White" BorderBrush="Black" BorderThickness="3,3,3,3"/>
+        <Image HorizontalAlignment="Left" Height="44" Margin="717,25,0,0" VerticalAlignment="Top" Width="47" Source="/sm logo.png"/>
+        <Label Content="Parking System Management" HorizontalAlignment="Left" Margin="29,32,0,0" Width="302" FontSize="16" FontFamily="Arial Black" HorizontalContentAlignment="Center" RenderTransformOrigin="0.5,0.531" Foreground="#FF012E6B" Height="37" VerticalAlignment="Top"/>
+        <Image x:Name="LogoutImage" MouseDown="LogoutImage_MouseDown" HorizontalAlignment="Left" Height="27" Margin="42,360,0,0" VerticalAlignment="Top" Width="23" Source="/log-out (2).png" OpacityMask="#FF652626" RenderTransformOrigin="0.503,0.225"/>
+        <Button x:Name="AdminButton" Content="View Logs" HorizontalAlignment="Left" VerticalAlignment="Top" Height="130" Width="230" Margin="280,270,0,0" Click="AdminButton_Click" FontSize="18" FontFamily="Arial Black" Background="#FF2C4B74" Foreground="White" BorderBrush="Black" BorderThickness="3,3,3,3" />
+        <Label Content="Log Out" MouseDown="LogoutImage_MouseDown" HorizontalAlignment="Left" Margin="19,382,0,0" Width="69" FontFamily="Arial Black" HorizontalContentAlignment="Center" RenderTransformOrigin="0.5,0.531" Foreground="#FF012E6B" Height="30" VerticalAlignment="Top" FontSize="10"/>
+
     </Grid>
 </Window>

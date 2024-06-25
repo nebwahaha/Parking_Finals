@@ -47,13 +47,13 @@
         <classShapeMoniker Id="f57a9690-d21a-4772-a341-ee0984b7e588" />
       </nodes>
     </associationConnector>
-    <classShape Id="75d19b55-8708-4205-ae95-24c71de2f31e" absoluteBounds="6.25, 5.25, 2, 1.1939925130208333">
+    <classShape Id="75d19b55-8708-4205-ae95-24c71de2f31e" absoluteBounds="5.25, 4.75, 2, 1.1939925130208333">
       <DataClassMoniker Name="/mallparkingDataContext/Plate_Number" />
       <nestedChildShapes>
-        <elementListCompartment Id="0779b8c7-9984-4147-a494-0f75a76e2e5f" absoluteBounds="6.265, 5.71, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+        <elementListCompartment Id="0779b8c7-9984-4147-a494-0f75a76e2e5f" absoluteBounds="5.265, 5.21, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(6.75 : 5.25); (6.75 : 4.3381982421875)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(6.25 : 4.75); (6.25 : 4.3381982421875)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/mallparkingDataContext/Plate_Number/Plate_Number_Customer" />
       <nodes>
         <classShapeMoniker Id="75d19b55-8708-4205-ae95-24c71de2f31e" />

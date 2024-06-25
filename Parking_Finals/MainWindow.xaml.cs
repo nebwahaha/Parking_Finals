@@ -1,4 +1,4 @@
-﻿using Parking_Finals;
+﻿                                                                 using Parking_Finals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace Parking_Finals
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private mallparkingDataContext _lsDC = null;
@@ -29,6 +26,8 @@ namespace Parking_Finals
         {
             InitializeComponent();
             _lsDC = new mallparkingDataContext(Properties.Settings.Default.mallparkingConnectionString);
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
         }
 
         private void btnLogin_Click(object sender, RoutedEventArgs e)
@@ -63,6 +62,22 @@ namespace Parking_Finals
             else
             {
                 MessageBox.Show("Username and password are incorrect");
+            }
+        }
+
+        private void txtbusername_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                txtbpass.Focus();
+            }
+        }
+
+        private void txtbpass_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                btnLogin_Click(sender, e);
             }
         }
     }

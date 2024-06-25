@@ -67,6 +67,12 @@
     <Compile Include="Window2.xaml.cs">
       <DependentUpon>Window2.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Window3.xaml.cs">
+      <DependentUpon>Window3.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Window4.xaml.cs">
+      <DependentUpon>Window4.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -84,6 +90,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Window2.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Window3.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Window4.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -134,9 +148,6 @@
     <PackageReference Include="AForge">
       <Version>2.2.5</Version>
     </PackageReference>
-    <PackageReference Include="AForge.Controls">
-      <Version>2.2.5</Version>
-    </PackageReference>
     <PackageReference Include="AForge.Imaging">
       <Version>2.2.5</Version>
     </PackageReference>
@@ -155,6 +166,27 @@
     <PackageReference Include="System.Drawing.Primitives">
       <Version>4.3.0</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="sm login bg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="sm logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="log-out %282%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="user.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="entranceexit bg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="circle-chevron-left.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="log-out %283%29.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

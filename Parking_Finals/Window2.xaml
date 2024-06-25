@@ -5,24 +5,107 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Parking_Finals"
         mc:Ignorable="d"
-        Title="Window2" Height="450" Width="800">
+        Title="Entrance"  Height="550" Width="850" >
+    <Window.Resources>
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+        <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+        <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+        <Style x:Key="BUTTON" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" CornerRadius="5" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true" Margin="0,13,0,0">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.MouseOver.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
-        <TextBox x:Name="UsernameTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="10,10,0,0" Width="150" />
-        <TextBox x:Name="StaffIDTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="10,38,0,0" Width="150" />
-        <TextBox x:Name="ParkingCapacity" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="10,93,0,0" Width="65" />
-        <TextBox x:Name="AvailableSlot" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="95,93,0,0" Width="65" />
-        <TextBox x:Name="PlateNumberTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="10,121,0,0" Width="150"/>
-        <TextBox x:Name="CustomerNameTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="10,149,0,0" Width="150" />
-        <TextBox x:Name="ContactNumberTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="10,177,0,0" Width="150"/>
-        <TextBox x:Name="DateTimeTextBox" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="16" Margin="0,10,0,0" Width="175" IsReadOnly="True"/>
+        <Grid.Background>
+            <ImageBrush ImageSource="/entranceexit bg.png"/>
+        </Grid.Background>
+        <TextBox x:Name="UsernameTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="329,110,0,0" Width="150" FontFamily="Arial Black" BorderBrush="{x:Null}" Background="{x:Null}" Foreground="#FF2C4B74" FontSize="10" />
+        <TextBox x:Name="StaffIDTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="621,44,0,0" Width="150" FontFamily="Segoe UI Semibold" Background="#FF2C4B74" Foreground="White" BorderBrush="#FF2C4B74" Visibility="Hidden" />
+        <TextBox x:Name="ParkingCapacity" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="82,179,0,0" Width="66" FontFamily="Segoe UI Black" BorderBrush="Black" BorderThickness="2,2,2,2" TextAlignment="Center" />
+        <TextBox x:Name="AvailableSlot" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="168,179,0,0" Width="64" FontFamily="Segoe UI Black" BorderThickness="2,2,2,2" BorderBrush="Black" TextAlignment="Center" />
+        <TextBox x:Name="PlateNumberTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Margin="82,229,0,0" Width="150" FontFamily="Segoe UI Semibold" Background="#FF2C4B74" BorderBrush="Black" Foreground="White" Height="34" BorderThickness="2,2,2,2" TextAlignment="Center"/>
+        <TextBox x:Name="CustomerNameTextBox"    HorizontalAlignment="Left"  VerticalAlignment="Top" FontSize="16" Margin="82,352,0,0" Width="150" FontFamily="Segoe UI Semibold" Background="#FF2C4B74" BorderBrush="#FF2C4B74" Foreground="White" TextAlignment="Center" />
+        <TextBox x:Name="ContactNumberTextBox"  HorizontalAlignment="Left"   VerticalAlignment="Top" FontSize="16" Margin="82,404,0,0" Width="150" FontFamily="Segoe UI Semibold" Foreground="White" Background="#FF2C4B74" BorderBrush="#FF2C4B74" TextAlignment="Center"/>
+        <TextBox x:Name="DateTimeTextBox" HorizontalAlignment="Left"  VerticalAlignment="Top" FontSize="18" Margin="569,95,0,0" Width="233" IsReadOnly="True" FontFamily="Segoe UI Black" Background="{x:Null}" Foreground="#FF2C4B74" BorderBrush="{x:Null}"/>
+        <Label Content="Entrance Booth" HorizontalAlignment="Left" Height="32" VerticalAlignment="Top" Width="160" FontSize="18" FontFamily="Segoe UI Black" RenderTransformOrigin="0.666,0.584" Foreground="#FF2C4B74" Margin="306,79,0,0"/>
+        <!--Visibility="Collapsed"-->
+        <Button Content="Exit" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="48" Margin="702,426,0,0" Click="ExitButton_Click" FontFamily="Segoe UI Black" BorderBrush="#FF2C4B74" Background="White" BorderThickness="2,2,2,2" Style="{DynamicResource BUTTON}" FontSize="14"/>
 
-        <Button Content="Exit" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="30" Margin="10,205,0,0" Click="ExitButton_Click"/>
+        <Border BorderBrush="#FF2C4B74" BorderThickness="2" Margin="312,137,48,126">
+            <Image x:Name="videoImage" Stretch="UniformToFill" Margin="1,0,2,0"/>
+        </Border>
 
-        <Image x:Name="videoImage" Margin="411,126,35,126" />
+        <ComboBox x:Name="ParkingAreaDrop" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="82,123,0,0" Width="150" SelectionChanged="ParkingAreaDrop_SelectionChanged" FontFamily="Segoe UI Semibold" BorderBrush="#FF2C4B74" BorderThickness="2,2,2,2" FontSize="14">
+            <ComboBox.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black"/>
+                    <GradientStop Color="White" Offset="1"/>
+                </LinearGradientBrush>
+            </ComboBox.Background>
+        </ComboBox>
+        <ComboBox x:Name="ParkingTypeDrop" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="82,292,0,0" Width="150" FontFamily="Segoe UI Semibold" SelectionChanged="ParkingTypeDrop_SelectionChanged" BorderBrush="#FF2C4B74" BorderThickness="2,2,2,2" FontSize="14"/>
+        <Button Style="{DynamicResource BUTTON}" x:Name="BackButton" Content="Back" HorizontalAlignment="Left" VerticalAlignment="Top" Width="84" Height="46" Margin="29,18,0,0" Click="ConfirmButton_Click" FontFamily="Segoe UI Black" Background="White" BorderBrush="#FF2C4B74" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
 
-        <ComboBox x:Name="ParkingAreaDrop" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,66,0,0" Width="150" SelectionChanged="ParkingAreaDrop_SelectionChanged"/>
-        <ComboBox x:Name="ParkingTypeDrop" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,240,0,0" Width="150"/>
+        <Button Style="{DynamicResource BUTTON}" x:Name="ConfirmButton" Content="Confirm" HorizontalAlignment="Left" VerticalAlignment="Top" Width="108" Height="48" Margin="102,439,0,0" Click="ConfirmButton_Click" FontFamily="Segoe UI Black" Background="#FF0030FF" BorderBrush="#FF0030FF" BorderThickness="2,2,2,2" Foreground="White" FontSize="14"/>
+        <Image HorizontalAlignment="Left" Height="36" Margin="776,31,0,0" VerticalAlignment="Top" Width="40" Source="/sm logo.png"/>
+        <Label Content="Parking Area" HorizontalAlignment="Left" Height="32" Margin="82,91,0,0" VerticalAlignment="Top" Width="150" FontFamily="Segoe UI Black" HorizontalContentAlignment="Center" FontSize="14"/>
+        <Label Content="Total Slot" HorizontalAlignment="Left" Height="32" Margin="72,149,0,0" VerticalAlignment="Top" Width="86" FontFamily="Segoe UI Black" HorizontalContentAlignment="Center"/>
+        <Label Content="Available Slot" HorizontalAlignment="Left" Height="32" Margin="150,150,0,0" VerticalAlignment="Top" Width="98" FontFamily="Segoe UI Black" HorizontalContentAlignment="Center"/>
+        <Label Content="Plate Number" HorizontalAlignment="Left" Height="32" Margin="94,203,0,0" VerticalAlignment="Top" Width="128" FontFamily="Arial Black" HorizontalContentAlignment="Center" FontSize="14"/>
+        <Label Content="Parking Type" HorizontalAlignment="Left" Height="30" Margin="94,264,0,0" VerticalAlignment="Top" Width="128" FontFamily="Arial Black" HorizontalContentAlignment="Center" FontSize="14"/>
+        <Image HorizontalAlignment="Left" Height="13" Margin="312,111,0,0" VerticalAlignment="Top" Width="12" Source="/user.png" RenderTransformOrigin="0.521,0.503"/>
+        <Label x:Name="CustomerNameLabel" Content="Customer Name"   HorizontalAlignment="Left" Height="30" Margin="86,322,0,0" VerticalAlignment="Top" Width="138" FontFamily="Arial Black" HorizontalContentAlignment="Center" FontSize="14"/>
+        <Label x:Name="ContactNumberLabel" Content="Contact Number" HorizontalAlignment="Left" Height="32" Margin="86,376,0,0" VerticalAlignment="Top" Width="140" FontFamily="Arial Black" HorizontalContentAlignment="Center" FontSize="14"/>
 
-        <Button Content="Confirm" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="30" Margin="10,275,0,0" Click="ConfirmButton_Click"/>
+        <Image HorizontalAlignment="Left" Height="10" Margin="42,43,0,0" VerticalAlignment="Top" Width="13" Source="/circle-chevron-left.png" RenderTransformOrigin="0.02,-0.977"/>
+
     </Grid>
 </Window>

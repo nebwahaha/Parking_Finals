@@ -26,7 +26,7 @@ namespace Parking_Finals.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=DESKTOP-BGT610F\\SQLEXPRESS;Initial Catalog=mallparking;Integrated Sec" +
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=DESKTOP-96KLI0Q\\SQLEXPRESS;Initial Catalog=mallparking;Integrated Sec" +
             "urity=True;Connect Timeout=30;Encrypt=True;TrustServerCertificate=True")]
         public string mallparkingConnectionString {
             get {
