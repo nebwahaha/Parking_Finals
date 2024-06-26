@@ -127,7 +127,7 @@
 
 
         <!-- Logo Image -->
-        <Image Source="/sm logo.png" Margin="147,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="126" Height="136"/>
+        <Image Source="/sm logo.png" Margin="112,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="197" Height="211"/>
 
         <!-- Title Label -->
         <Label Content="Parking System&#xD;&#xA;Management" Margin="367,83,95,0" VerticalAlignment="Top" FontSize="20" FontFamily="Arial Black" Foreground="#FF012E6B" />

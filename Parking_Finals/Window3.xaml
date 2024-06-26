@@ -137,7 +137,7 @@
         <!-- Car Photo Display -->
         <Label Content="Vehicle Photo" HorizontalAlignment="Left" Height="32" Margin="956,132,0,0" VerticalAlignment="Top" Width="150" FontFamily="Segoe UI Black" HorizontalContentAlignment="Center" FontSize="14"/>
 
-        <Border BorderBrush="#FF2C4B74" BorderThickness="2" Margin="853,169,82,142">
+        <Border BorderBrush="#FF2C4B74" BorderThickness="5" Margin="853,169,82,161">
             <Image x:Name="CarPhotoImage" Margin="0,-2,-2,0" Height="220" VerticalAlignment="Top" HorizontalAlignment="Right" Width="365"/>
         </Border>
 
@@ -149,6 +149,16 @@
 
         <!-- Lost Ticket Button -->
         <Button x:Name="LostTicketButton" Content="Lost Ticket" Width="100" Height="43" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="550,0,0,78" Click="LostTicketButton_Click" FontFamily="Segoe UI Black" Foreground="White" FontSize="14" Background="#FF0030FF" BorderBrush="#FF0030FF"/>
+        <Border BorderBrush="White" BorderThickness="10" Height="61" VerticalAlignment="Top" HorizontalAlignment="Left" Width="4" Margin="190,191,0,0" RenderTransformOrigin="0.5,0.5">
+            <Border.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Border.RenderTransform>
+        </Border>
 
     </Grid>
 </Window>

@@ -1,22 +1,12 @@
-﻿using System;
+﻿using AForge.Video;
+using AForge.Video.DirectShow;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using AForge.Video;
-using AForge.Video.DirectShow;
 using System.Windows.Threading;
 
 namespace Parking_Finals
@@ -145,22 +135,45 @@ namespace Parking_Finals
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            StopCamera();
-            timer.Stop();
-            Application.Current.Shutdown();
+            try
+            {
+                // Stop the camera and the timer before shutting down
+                StopCamera();
+                timer.Stop();
+
+                // Shutdown the application
+                Application.Current.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                // Log or handle the exception if needed
+                MessageBox.Show($"An error occurred while exiting: {ex.Message}");
+            }
         }
 
         private void StopCamera()
         {
-            if (videoSource != null && videoSource.IsRunning)
+            try
             {
-                videoSource.SignalToStop();
-                videoSource.WaitForStop();
-                videoSource.NewFrame -= VideoSource_NewFrame;
-                videoSource = null;
+                if (videoSource != null)
+                {
+                    if (videoSource.IsRunning)
+                    {
+                        videoSource.SignalToStop();
+                        //videoSource.WaitForStop(); //ito yung part na sumira sa pag stop ng camera
+                    }
+                    videoSource.NewFrame -= VideoSource_NewFrame;
+                    videoSource = null;
+                }
+                currentFrame?.Dispose();
             }
-            currentFrame?.Dispose();
+            catch (Exception ex)
+            {
+                // Log or handle the exception if needed
+                MessageBox.Show($"An error occurred while stopping the camera: {ex.Message}");
+            }
         }
+
 
         private string GenerateCustomerID()
         {
@@ -228,12 +241,18 @@ namespace Parking_Finals
                 StopCamera();
                 timer.Stop();
 
-                // Navigate back to Window1
-                Window1 window1 = new Window1(_username, _staffID, _lsDC);  // Pass the necessary parameters to Window1 constructor
-                window1.Show();
-                this.Close();  // Close Window2
+                Task.Run(() =>
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        Window1 window1 = new Window1(_username, _staffID, _lsDC);
+                        window1.Show();
+                        this.Close();
+                    });
+                });
             }
         }
+
 
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
@@ -289,14 +308,12 @@ namespace Parking_Finals
 
                     MessageBox.Show("Data saved successfully!");
 
-                    // Clear the input fields
                     ClearInputFields();
                 }
 
                 AvailableSlot.Text = selectedParkingArea.Available_Slot.ToString();
             }
         }
-
 
 
         private string GenerateReceiptID()
@@ -313,6 +330,7 @@ namespace Parking_Finals
             return "RID" + newIdNumber;
         }
 
+
         private string GenerateUniquePlateNumber(string basePlateNumber)
         {
             int counter = 1;
@@ -326,6 +344,7 @@ namespace Parking_Finals
 
             return uniquePlateNumber;
         }
+
 
         private void InsertReceipt(string receiptId, DateTime timeIn, string parkingAreaId, string parkingStatus)
         {
@@ -359,7 +378,7 @@ namespace Parking_Finals
                     return null;
                 }
 
-                string directoryPath = "C:\\Users\\Benjamin\\Documents\\CarPhoto";
+                string directoryPath = "C:\\Users\\Benja\\Documents\\CarPhoto";
                 if (!System.IO.Directory.Exists(directoryPath))
                 {
                     System.IO.Directory.CreateDirectory(directoryPath);
@@ -394,12 +413,13 @@ namespace Parking_Finals
 
             return fileName;
         }
+
+
         private void ClearInputFields()
         {
             PlateNumberTextBox.Clear();
             CustomerNameTextBox.Clear();
             ContactNumberTextBox.Clear();
-            // Clear other textboxes if needed
         }
 
 

@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
+using System.Windows.Data;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Parking_Finals
 {
@@ -27,17 +22,23 @@ namespace Parking_Finals
             _staffID = staffID;
             _lsDC = lsDC;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-
         }
+
+        private Button _currentlyViewedButton;
+
 
         private void TableSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (TableSelector.SelectedItem is ComboBoxItem selectedItem)
             {
+                // Hide photo displays when changing tables
+                ORCRDisplay.Visibility = Visibility.Collapsed;
+                PhotoDisplay.Visibility = Visibility.Collapsed;
+
                 string selectedTable = selectedItem.Content.ToString();
                 Console.WriteLine($"Selected table: {selectedTable}");
                 DataGridView.Columns.Clear();
-                DataGridView.AutoGenerateColumns = true;
+                DataGridView.AutoGenerateColumns = false;
                 DataGridView.Visibility = Visibility.Visible;
 
                 NewEmployeeForm.Visibility = Visibility.Collapsed;
@@ -45,40 +46,57 @@ namespace Parking_Finals
                 switch (selectedTable)
                 {
                     case "Customer Table":
+                        SetDataGridColumns(typeof(Customer));
+                        var customerViewColumn = new DataGridTemplateColumn { Header = "Action" };
+                        var customerTemplate = new DataTemplate();
+                        var customerButtonFactory = new FrameworkElementFactory(typeof(Button));
+                        customerButtonFactory.SetValue(Button.ContentProperty, "View");
+                        customerButtonFactory.AddHandler(Button.ClickEvent, new RoutedEventHandler(ViewORCRButton_Click));
+                        customerButtonFactory.SetBinding(Button.TagProperty, new Binding("OR_CR"));
+                        customerTemplate.VisualTree = customerButtonFactory;
+                        customerViewColumn.CellTemplate = customerTemplate;
+
+                        DataGridView.Columns.Add(customerViewColumn);
                         DataGridView.ItemsSource = _lsDC.Customers.ToList();
                         Console.WriteLine($"Customer count: {_lsDC.Customers.Count()}");
                         break;
                     case "ParkingArea Table":
+                        SetDataGridColumns(typeof(ParkingArea));
                         DataGridView.ItemsSource = _lsDC.ParkingAreas.ToList();
                         Console.WriteLine($"ParkingArea count: {_lsDC.ParkingAreas.Count()}");
                         break;
                     case "Plate_Number Table":
+                        SetDataGridColumns(typeof(Plate_Number));
+                        var plateNumberViewColumn = new DataGridTemplateColumn { Header = "Action" };
+                        var plateNumberTemplate = new DataTemplate();
+                        var plateNumberButtonFactory = new FrameworkElementFactory(typeof(Button));
+                        plateNumberButtonFactory.SetValue(Button.ContentProperty, "View");
+                        plateNumberButtonFactory.AddHandler(Button.ClickEvent, new RoutedEventHandler(ViewPhotoButton_Click));
+                        plateNumberButtonFactory.SetBinding(Button.TagProperty, new Binding("Car_Photo"));
+                        plateNumberTemplate.VisualTree = plateNumberButtonFactory;
+                        plateNumberViewColumn.CellTemplate = plateNumberTemplate;
+
+                        DataGridView.Columns.Add(plateNumberViewColumn);
                         DataGridView.ItemsSource = _lsDC.Plate_Numbers.ToList();
                         Console.WriteLine($"Plate_Number count: {_lsDC.Plate_Numbers.Count()}");
                         break;
                     case "Receipt Table":
+                        SetDataGridColumns(typeof(Receipt));
                         DataGridView.ItemsSource = _lsDC.Receipts.ToList();
                         Console.WriteLine($"Receipt count: {_lsDC.Receipts.Count()}");
                         break;
                     case "Staff Table":
-                        DataGridView.AutoGenerateColumns = false;
-                        DataGridView.Columns.Add(new DataGridTextColumn { Header = "Staff ID", Binding = new System.Windows.Data.Binding("Staff_ID") });
-                        DataGridView.Columns.Add(new DataGridTextColumn { Header = "Staff Name", Binding = new System.Windows.Data.Binding("Staff_Name") });
-                        DataGridView.Columns.Add(new DataGridTextColumn { Header = "Staff Username", Binding = new System.Windows.Data.Binding("Staff_Username") });
-                        DataGridView.Columns.Add(new DataGridTextColumn { Header = "Staff Role", Binding = new System.Windows.Data.Binding("Staff_Role") });
-                        DataGridView.Columns.Add(new DataGridTextColumn { Header = "Staff Status", Binding = new System.Windows.Data.Binding("Staff_Status") });
+                        SetDataGridColumns(typeof(Staff));
+                        var staffActionColumn = new DataGridTemplateColumn { Header = "Action" };
+                        var staffTemplate = new DataTemplate();
+                        var staffButtonFactory = new FrameworkElementFactory(typeof(Button));
+                        staffButtonFactory.SetValue(Button.ContentProperty, "Toggle Status");
+                        staffButtonFactory.AddHandler(Button.ClickEvent, new RoutedEventHandler(ToggleStatusButton_Click));
+                        staffButtonFactory.SetBinding(Button.TagProperty, new Binding("Staff_ID"));
+                        staffTemplate.VisualTree = staffButtonFactory;
+                        staffActionColumn.CellTemplate = staffTemplate;
 
-                        var actionColumn = new DataGridTemplateColumn { Header = "Action" };
-                        var template = new DataTemplate();
-                        var buttonFactory = new FrameworkElementFactory(typeof(Button));
-                        buttonFactory.SetValue(Button.ContentProperty, "Toggle Status");
-                        buttonFactory.AddHandler(Button.ClickEvent, new RoutedEventHandler(ToggleStatusButton_Click));
-                        buttonFactory.SetBinding(Button.TagProperty, new System.Windows.Data.Binding("Staff_ID"));
-                        template.VisualTree = buttonFactory;
-                        actionColumn.CellTemplate = template;
-
-                        DataGridView.Columns.Add(actionColumn);
-
+                        DataGridView.Columns.Add(staffActionColumn);
                         DataGridView.ItemsSource = _lsDC.Staffs.ToList();
                         Console.WriteLine($"Staff count: {_lsDC.Staffs.Count()}");
                         break;
@@ -88,6 +106,88 @@ namespace Parking_Finals
                 }
             }
         }
+
+
+        private void ViewORCRButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button viewButton)
+            {
+                // Close the currently viewed photo and reset its button
+                if (_currentlyViewedButton != null && _currentlyViewedButton != viewButton)
+                {
+                    ORCRDisplay.Visibility = Visibility.Collapsed;
+                    _currentlyViewedButton.Content = "View";
+                }
+
+                string photoUri = viewButton.Tag?.ToString();
+
+                if (viewButton.Content.ToString() == "View")
+                {
+                    if (!string.IsNullOrWhiteSpace(photoUri))
+                    {
+                        try
+                        {
+                            BitmapImage bitmap = new BitmapImage(new Uri(photoUri, UriKind.RelativeOrAbsolute));
+                            ORCRDisplay.Source = bitmap;
+                            ORCRDisplay.Visibility = Visibility.Visible;
+                            viewButton.Content = "Close";
+                            _currentlyViewedButton = viewButton;
+                        }
+                        catch (Exception)
+                        {
+                            MessageBox.Show("Unable to display the photo. Please check the photo path.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("There is no photo for this entry.", "No Photo", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+                else if (viewButton.Content.ToString() == "Close")
+                {
+                    ORCRDisplay.Visibility = Visibility.Collapsed;
+                    viewButton.Content = "View";
+                    _currentlyViewedButton = null;
+                }
+            }
+        }
+
+
+        private void SetDataGridColumns(Type entityType)
+        {
+            foreach (PropertyInfo property in entityType.GetProperties())
+            {
+                // Exclude certain properties for the Customer table
+                if (entityType == typeof(Customer) && (property.Name == "Plate_Number1" || property.Name == "Receipt"))
+                {
+                    continue;
+                }
+                if (entityType == typeof(ParkingArea) && (property.Name == "Receipts"))
+                {
+                    continue;
+                }
+                if (entityType == typeof(Plate_Number) && (property.Name == "Customers"))
+                {
+                    continue;
+                }
+                if (entityType == typeof(Receipt) && (property.Name == "Customers" || property.Name == "ParkingArea" || property.Name == "Staff"))
+                {
+                    continue;
+                }
+                if (entityType == typeof(Staff) && (property.Name == "Receipts"))
+                {  
+                    continue; 
+                }
+
+                DataGridTextColumn column = new DataGridTextColumn
+                {
+                    Header = property.Name,
+                    Binding = new Binding(property.Name)
+                };
+                DataGridView.Columns.Add(column);
+            }
+        }
+
 
         private void AddEmployeeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -126,7 +226,6 @@ namespace Parking_Finals
             DataGridView.ItemsSource = _lsDC.Staffs.ToList();
             NewEmployeeForm.Visibility = Visibility.Collapsed;
 
-            // Clear textboxes after saving
             ClearEmployeeForm();
         }
 
@@ -142,6 +241,7 @@ namespace Parking_Finals
             homeWindow.Show();
             this.Close();
         }
+
         private void ClearEmployeeForm()
         {
             StaffNameTextBox.Clear();
@@ -175,21 +275,66 @@ namespace Parking_Finals
                 {
                     staff.Staff_Status = staff.Staff_Status == "Active" ? "Inactive" : "Active";
                     _lsDC.SubmitChanges();
-                    DataGridView.ItemsSource = _lsDC.Staffs.ToList(); // Refresh the grid
+                    DataGridView.ItemsSource = _lsDC.Staffs.ToList();
                 }
             }
         }
+
+        private void ViewPhotoButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button viewButton)
+            {
+                // Close the currently viewed photo and reset its button
+                if (_currentlyViewedButton != null && _currentlyViewedButton != viewButton)
+                {
+                    PhotoDisplay.Visibility = Visibility.Collapsed;
+                    _currentlyViewedButton.Content = "View";
+                }
+
+                string photoUri = viewButton.Tag?.ToString();
+
+                if (viewButton.Content.ToString() == "View")
+                {
+                    if (!string.IsNullOrWhiteSpace(photoUri))
+                    {
+                        try
+                        {
+                            BitmapImage bitmap = new BitmapImage(new Uri(photoUri, UriKind.RelativeOrAbsolute));
+                            PhotoDisplay.Source = bitmap;
+                            PhotoDisplay.Visibility = Visibility.Visible;
+                            viewButton.Content = "Close";
+                            _currentlyViewedButton = viewButton;
+                        }
+                        catch (Exception)
+                        {
+                            MessageBox.Show("Unable to display the photo. Please check the photo path.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("There is no photo for this entry.", "No Photo", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+                else if (viewButton.Content.ToString() == "Close")
+                {
+                    PhotoDisplay.Visibility = Visibility.Collapsed;
+                    viewButton.Content = "View";
+                    _currentlyViewedButton = null;
+                }
+            }
+        }
+
+
+
         private void Logoutlog_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            // Show confirmation dialog
             MessageBoxResult result = MessageBox.Show("Are you sure you want to log out?", "Confirm Logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
             {
-                // Navigate back to MainWindow
                 MainWindow mainWindow = new MainWindow();
                 mainWindow.Show();
-                Close(); // Close the current Window4 instance
+                Close();
             }
         }
     }

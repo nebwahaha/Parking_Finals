@@ -1,23 +1,13 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Parking_Finals
 {
-    /// <summary>
-    /// Interaction logic for Window3.xaml
-    /// </summary>
     public partial class Window3 : Window
     {
         private string _username;
@@ -74,17 +64,14 @@ namespace Parking_Finals
                 string selectedFileName = openFileDialog.FileName;
                 UpdateCustomerORCR(selectedFileName);
 
-                // Set the lost ticket flag
                 _isLostTicket = true;
 
-                // Update the total amount with the lost ticket fee
                 if (decimal.TryParse(TotalAmount.Text, out decimal totalAmount))
                 {
-                    totalAmount += 200m; // Add 200 pesos for lost ticket fee
+                    totalAmount += 200m;
                     TotalAmount.Text = totalAmount.ToString("F2");
                 }
 
-                // Update parking status to include (Lost Ticket) in the Receipts table
                 var receiptId = ReceiptIDTextBox.Text.Trim();
                 var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == receiptId);
                 if (receipt != null)
@@ -108,11 +95,8 @@ namespace Parking_Finals
         }
 
 
-
-
         private void UpdateCustomerORCR(string filePath)
         {
-            // Assuming the PlateNumberTextBox contains the plate number of the current customer
             string plateNumber = PlateNumberTextBox.Text.Trim();
             if (!string.IsNullOrEmpty(plateNumber))
             {
@@ -149,7 +133,7 @@ namespace Parking_Finals
                         receipt.Payment_Method = "Cash";
                         receipt.Payment_Status = "Paid";
                         receipt.Total_Amount = totalAmount;
-                        receipt.Change_Amount = change;
+                        receipt.Change_Amount = change.ToString("F2");
                         receipt.Staff_ID = _staffID;
                         receipt.Time_Out = DateTime.Now;
 
@@ -162,7 +146,6 @@ namespace Parking_Finals
                         _lsDC.SubmitChanges();
                         MessageBox.Show("Cash payment successful.");
 
-                        // Clear the input fields after payment
                         ClearInputFields();
                     }
                     else
@@ -192,7 +175,7 @@ namespace Parking_Finals
                     receipt.Payment_Method = "GCash";
                     receipt.Payment_Status = "Paid";
                     receipt.Total_Amount = totalAmount;
-                    receipt.Change_Amount = 0m;
+                    receipt.Change_Amount = 0m.ToString("F2");
                     receipt.Staff_ID = _staffID;
                     receipt.Time_Out = DateTime.Now;
 
@@ -205,7 +188,6 @@ namespace Parking_Finals
                     _lsDC.SubmitChanges();
                     MessageBox.Show("GCash payment successful.");
 
-                    // Clear the input fields after payment
                     ClearInputFields();
                 }
                 else
@@ -231,7 +213,7 @@ namespace Parking_Finals
                     var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == customer.Receipt_ID && r.Payment_Status != "Paid");
                     if (receipt != null)
                     {
-                        DisplayReceiptDetails(customer.Receipt_ID); // Pass receipt ID as search term
+                        DisplayReceiptDetails(customer.Receipt_ID);
                     }
                     else
                     {
@@ -260,8 +242,6 @@ namespace Parking_Finals
         }
 
 
-
-
         private void SearchByReceiptID(string receiptId)
         {
             var customer = _lsDC.Customers.FirstOrDefault(c => c.Receipt_ID == receiptId);
@@ -270,7 +250,7 @@ namespace Parking_Finals
                 var receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == receiptId && r.Payment_Status != "Paid");
                 if (receipt != null)
                 {
-                    DisplayReceiptDetails(receiptId); // Pass receipt ID as search term
+                    DisplayReceiptDetails(receiptId);
                 }
                 else
                 {
@@ -286,6 +266,7 @@ namespace Parking_Finals
                 ClearReceiptDetails();
             }
         }
+
         private void DisplayCustomerDetails(Customer customer, string plateNumber)
         {
             PlateNumberTextBox.Text = customer.Plate_Number;
@@ -296,19 +277,15 @@ namespace Parking_Finals
 
         private void ClearButtonClick(object sender, RoutedEventArgs e)
         {
-            // Clear the PlateNumberTextBox and ReceiptIDTextBox
             PlateNumberTextBox.Clear();
             ReceiptIDTextBox.Clear();
 
-            // Optionally, clear other fields or reset UI as needed
             ClearCustomerDetails();
             ClearReceiptDetails();
         }
 
-
         private Customer SearchReceiptDetails(string searchTerm)
         {
-            // Search in database or your data source for the receipt details
             Customer foundCustomer = _lsDC.Customers.FirstOrDefault(c =>
                 c.Plate_Number == searchTerm || c.Receipt_ID == searchTerm);
 
@@ -317,48 +294,40 @@ namespace Parking_Finals
 
         private void DisplayReceiptDetails(string searchTerm)
         {
-            _isLostTicket = false; // Reset the lost ticket flag
-
-            // Search for receipt details based on the search term
+            _isLostTicket = false;
             Customer customer = SearchReceiptDetails(searchTerm);
+
             if (customer != null)
             {
-                // Display found customer's details
                 PlateNumberTextBox.Text = customer.Plate_Number;
                 ReceiptIDTextBox.Text = customer.Receipt_ID;
                 CustomerNameTextBox.Text = customer.Customer_Name;
                 ContactNumberTextBox.Text = customer.Contact_Number;
-
-                // Fetch receipt details
                 Receipt receipt = _lsDC.Receipts.FirstOrDefault(r => r.Receipt_ID == customer.Receipt_ID);
+
                 if (receipt != null && receipt.Time_IN.HasValue)
                 {
                     DateTime timeIn = receipt.Time_IN.Value;
                     DateTime timeOut = DateTime.Now;
                     TimeInTextBox.Text = timeIn.ToString();
                     TimeOutTextBox.Text = timeOut.ToString();
-
-                    // Calculate parking duration
                     TimeSpan duration = timeOut - timeIn;
-
-                    // Calculate total amount based on parking duration
                     decimal totalAmount;
                     if (duration.TotalHours <= 12)
                     {
-                        totalAmount = 30m; // 30 PHP for up to 12 hours
+                        totalAmount = 30m;
                     }
                     else
                     {
                         int numberOfOvernightDays = (int)Math.Ceiling(duration.TotalDays) - 1;
-                        totalAmount = 300m + numberOfOvernightDays * 300m; // Base amount + additional days calculation
+                        totalAmount = 300m + numberOfOvernightDays * 300m;
                         receipt.Parking_Status = $"Overnight ({numberOfOvernightDays + 1} days)";
                         receipt.Total_Amount = totalAmount;
-                        _lsDC.SubmitChanges(); // Save changes to the database
+                        _lsDC.SubmitChanges();
                     }
 
-                    TotalAmount.Text = totalAmount.ToString("F2"); // Display total amount
+                    TotalAmount.Text = totalAmount.ToString("F2");
 
-                    // Display other receipt information
                     ParkingAreaIDTextBox.Text = receipt.ParkingArea_ID.ToString();
                     ParkingStatusTextBox.Text = receipt.Parking_Status;
 
@@ -403,8 +372,8 @@ namespace Parking_Finals
             ParkingAreaIDTextBox.Text = string.Empty;
             ParkingStatusTextBox.Text = string.Empty;
             TotalAmount.Text = string.Empty;
-            PaymentInputTextBox.Text = string.Empty; // Clear payment input
-            ChangeTextBox.Text = string.Empty; // Clear change display
+            PaymentInputTextBox.Text = string.Empty;
+            ChangeTextBox.Text = string.Empty;
             CarPhotoImage.Source = null;
         }
 
@@ -458,12 +427,10 @@ namespace Parking_Finals
 
         private void BackHomeButton_Click(object sender, RoutedEventArgs e)
         {
-            // Show confirmation dialog
             MessageBoxResult result = MessageBox.Show("Are you sure you want to go back?", "Confirm Back Home", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
             {
-                // Navigate back to MainWindow
                 Window1 window1 = new Window1(_username, _staffID, _lsDC);
                 window1.Show();
                 this.Close();

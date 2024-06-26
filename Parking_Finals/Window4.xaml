@@ -15,8 +15,6 @@
             <Setter Property="FontStyle" Value="Normal"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontFamily" Value="Segoe UI Black"/>
-
-
         </Style>
     </Window.Resources>
     <Grid>
@@ -32,12 +30,8 @@
         </Grid.RowDefinitions>
         <Border Grid.Row="1" Background="#FF2C4B74" CornerRadius="0 0 0 0" Margin="-3,0,36,0" Grid.RowSpan="3">
             <Button  x:Name="HomeLogs" Content="Back Home" HorizontalAlignment="Center" VerticalAlignment="Top" Width="152" Height="35" Click="HomeLogsButton_Click" FontFamily="Segoe UI Black" Background="White" BorderBrush="White" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
-
-
         </Border>
         <Label Content="Parking System Management Logs" HorizontalAlignment="Left" Margin="23,35,0,0" Width="430" FontSize="20" FontFamily="Arial Black" RenderTransformOrigin="0.5,0.531" Foreground="#FF012E6B" Height="38" VerticalAlignment="Top" Grid.RowSpan="2" Grid.Column="1"/>
-
-
         <ComboBox x:Name="TableSelector" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" Margin="21,10,0,0" SelectionChanged="TableSelector_SelectionChanged" Height="22" Grid.Column="1" Grid.Row="2">
             <ComboBoxItem Content="Customer Table" />
             <ComboBoxItem Content="ParkingArea Table" />
@@ -45,27 +39,16 @@
             <ComboBoxItem Content="Receipt Table" />
             <ComboBoxItem Content="Staff Table" />
         </ComboBox>
-
         <Button x:Name="AddEmployeeButton" Content="Add New Employee" HorizontalAlignment="Left" VerticalAlignment="Top" Width="225" Margin="265,2,0,0" Click="AddEmployeeButton_Click" FontSize="16" FontFamily="Segoe UI Black" Background="#FF2C4B74" Foreground="White" Height="33" Grid.Row="2" BorderBrush="#FF2C4B74" Grid.Column="1"/>
-
-        <DataGrid x:Name="DataGridView" Visibility="Collapsed" AutoGenerateColumns="True" Margin="14,63,52,70" Grid.Row="2" Grid.Column="1" Grid.RowSpan="2"/>
-
-
-        <!-- New Employee Form -->
-        <!-- "-->
-        <StackPanel x:Name="NewEmployeeForm" Visibility="Collapsed"  Orientation="Vertical" Margin="136,140,192,126" Grid.Row="2" Grid.Column="1" Grid.RowSpan="2">
-
+        <DataGrid x:Name="DataGridView" CanUserAddRows="False" Visibility="Collapsed" AutoGenerateColumns="True" Margin="14,63,52,70" Grid.Row="2" Grid.Column="1" Grid.RowSpan="2"/>
+        <StackPanel x:Name="NewEmployeeForm" Visibility="Collapsed" Orientation="Vertical" Margin="136,140,192,126" Grid.Row="2" Grid.Column="1" Grid.RowSpan="2">
             <Label Content="Staff Full Name:" FontFamily="Arial Black" Width="128" Foreground="#FF2C4B74"/>
-
             <TextBox x:Name="StaffNameTextBox" Margin="0,5" FontFamily="Segoe UI Semibold" FontSize="14" Width="572" HorizontalAlignment="Right"/>
             <Label Content=" Username:" FontFamily="Arial Black" Width="84" Foreground="#FF2C4B74"/>
-
             <TextBox x:Name="StaffUsernameTextBox" Margin="0,5" FontFamily="Segoe UI Semibold" Width="572" HorizontalAlignment="Right" Height="19" FontSize="14"/>
             <Label Content="Password:" FontFamily="Arial Black" Width="84" Foreground="#FF2C4B74"/>
-
             <PasswordBox x:Name="StaffPasswordBox" Width="572" HorizontalAlignment="Right"/>
             <Label Content="Staff Role:" FontFamily="Arial Black" Width="84" Foreground="#FF2C4B74"/>
-
             <ComboBox x:Name="StaffRoleComboBox" Margin="0,5" FontFamily="Segoe UI Semibold" FontSize="14" Width="351">
                 <ComboBoxItem Content="Cashier"/>
                 <ComboBoxItem Content="Admin"/>
@@ -75,9 +58,11 @@
                 <Button Content="Back" Click="BackButton_Click" Height="48" Width="100" FontFamily="Segoe UI Black" FontSize="16" BorderBrush="#FF2C4B74" Background="{x:Null}"/>
             </StackPanel>
         </StackPanel>
+        <Image x:Name="PhotoDisplay" Visibility="Visible" Margin="459,83,0,0" Grid.Row="2" Grid.Column="1" Grid.RowSpan="2" Height="242" VerticalAlignment="Top" HorizontalAlignment="Left" Width="395"/>
+        <Image x:Name="ORCRDisplay" Visibility="Visible" Margin="21,83,0,0" Grid.Row="2" Grid.Column="1" Grid.RowSpan="2" Height="292" VerticalAlignment="Top" HorizontalAlignment="Left" Width="426"/>
+
         <Image Grid.Column="1" HorizontalAlignment="Left" Height="52" Margin="784,22,0,0" Grid.RowSpan="2" VerticalAlignment="Top" Width="58" Source="/sm logo.png"/>
         <Image x:Name="logoutlog" Margin="47,174,87,57" Grid.Row="3" MouseDown="Logoutlog_MouseDown" Source="/log-out (3).png" RenderTransformOrigin="0.729,1.042"/>
         <Label Content="Log Out" MouseDown="Logoutlog_MouseDown" HorizontalAlignment="Left" Margin="31,224,0,0" Width="69" FontFamily="Arial Black" HorizontalContentAlignment="Center" RenderTransformOrigin="0.5,0.531" Foreground="White" Height="30" VerticalAlignment="Top" FontSize="10" Grid.Row="3"/>
-
     </Grid>
 </Window>

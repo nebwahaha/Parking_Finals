@@ -1,5 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="mallparking" Class="mallparkingDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="AppSettings" ConnectionString="Data Source=DESKTOP-BGT610F\SQLEXPRESS;Initial Catalog=mallparking;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True" SettingsObjectName="Parking_Finals.Properties.Settings" SettingsPropertyName="mallparkingConnectionString" Provider="System.Data.SqlClient" />
+  <Connection Mode="AppSettings" ConnectionString="Data Source=NEB\SQLEXPRESS;Initial Catalog=mallparking;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True" SettingsObjectName="Parking_Finals.Properties.Settings" SettingsPropertyName="mallparkingConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Customer" Member="Customers">
+    <Type Name="Customer">
+      <Column Name="Customer_ID" Type="System.String" DbType="VarChar(100) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Customer_Name" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="Plate_Number" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="Receipt_ID" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="Contact_Number" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="[OR/CR]" Member="OR_CR" Type="System.String" DbType="VarChar(MAX)" CanBeNull="true" />
+      <Association Name="Plate_Number_Customer" Member="Plate_Number1" ThisKey="Plate_Number" OtherKey="Plate_Number1" Type="Plate_Number" IsForeignKey="true" />
+      <Association Name="Receipt_Customer" Member="Receipt" ThisKey="Receipt_ID" OtherKey="Receipt_ID" Type="Receipt" IsForeignKey="true" />
+    </Type>
+  </Table>
   <Table Name="dbo.ParkingArea" Member="ParkingAreas">
     <Type Name="ParkingArea">
       <Column Name="ParkingArea_ID" Type="System.String" DbType="VarChar(100) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
@@ -9,13 +21,20 @@
       <Association Name="ParkingArea_Receipt" Member="Receipts" ThisKey="ParkingArea_ID" OtherKey="ParkingArea_ID" Type="Receipt" />
     </Type>
   </Table>
+  <Table Name="dbo.Plate_Number" Member="Plate_Numbers">
+    <Type Name="Plate_Number">
+      <Column Name="Plate_Number" Member="Plate_Number1" Type="System.String" DbType="VarChar(100) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Car_Photo" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Association Name="Plate_Number_Customer" Member="Customers" ThisKey="Plate_Number1" OtherKey="Plate_Number" Type="Customer" />
+    </Type>
+  </Table>
   <Table Name="dbo.Receipt" Member="Receipts">
     <Type Name="Receipt">
       <Column Name="Receipt_ID" Type="System.String" DbType="VarChar(100) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="Payment_Method" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
       <Column Name="Payment_Status" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
       <Column Name="Total_Amount" Type="System.Decimal" DbType="Decimal(10,2)" CanBeNull="true" />
-      <Column Name="Change_Amount" Type="System.Decimal" DbType="Decimal(10,2)" CanBeNull="true" />
+      <Column Name="Change_Amount" Type="System.String" DbType="VarChar(MAX)" CanBeNull="true" />
       <Column Name="Staff_ID" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
       <Column Name="ParkingArea_ID" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
       <Column Name="Parking_Status" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
@@ -24,18 +43,6 @@
       <Association Name="Receipt_Customer" Member="Customers" ThisKey="Receipt_ID" OtherKey="Receipt_ID" Type="Customer" />
       <Association Name="ParkingArea_Receipt" Member="ParkingArea" ThisKey="ParkingArea_ID" OtherKey="ParkingArea_ID" Type="ParkingArea" IsForeignKey="true" />
       <Association Name="Staff_Receipt" Member="Staff" ThisKey="Staff_ID" OtherKey="Staff_ID" Type="Staff" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Customer" Member="Customers">
-    <Type Name="Customer">
-      <Column Name="Customer_ID" Type="System.String" DbType="VarChar(100) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="Customer_Name" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="Plate_Number" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="Receipt_ID" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="Contact_Number" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="[OR/CR]" Member="OR_CR" Type="System.String" DbType="VarChar(MAX)" CanBeNull="true" />
-      <Association Name="Receipt_Customer" Member="Receipt" ThisKey="Receipt_ID" OtherKey="Receipt_ID" Type="Receipt" IsForeignKey="true" />
-      <Association Name="Plate_Number_Customer" Member="Plate_Number1" ThisKey="Plate_Number" OtherKey="Plate_Number1" Type="Plate_Number" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Staff" Member="Staffs">
@@ -47,13 +54,6 @@
       <Column Name="Staff_Password" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
       <Column Name="Staff_Status" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
       <Association Name="Staff_Receipt" Member="Receipts" ThisKey="Staff_ID" OtherKey="Staff_ID" Type="Receipt" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Plate_Number" Member="Plate_Numbers">
-    <Type Name="Plate_Number">
-      <Column Name="Plate_Number" Member="Plate_Number1" Type="System.String" DbType="VarChar(100) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="Car_Photo" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
-      <Association Name="Plate_Number_Customer" Member="Customers" ThisKey="Plate_Number1" OtherKey="Plate_Number" Type="Customer" />
     </Type>
   </Table>
 </Database>
