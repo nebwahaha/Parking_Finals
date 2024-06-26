@@ -253,15 +253,20 @@ namespace Parking_Finals
             }
         }
 
-
-
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
-            string plateNumber = PlateNumberTextBox.Text.Trim();
+            string plateNumber = PlateNumberTextBox.Text.Trim().ToUpper(); // Convert to uppercase
 
+            // Validate the plate number
             if (string.IsNullOrWhiteSpace(plateNumber))
             {
                 MessageBox.Show("Plate number is required.");
+                return;
+            }
+
+            if (!IsValidPlateNumber(plateNumber))
+            {
+                MessageBox.Show("Invalid plate number. It should be either only numbers or a combination of letters and numbers.");
                 return;
             }
 
@@ -313,6 +318,19 @@ namespace Parking_Finals
 
                 AvailableSlot.Text = selectedParkingArea.Available_Slot.ToString();
             }
+        }
+
+        private bool IsValidPlateNumber(string plateNumber)
+        {
+            if (plateNumber.All(char.IsDigit))
+            {
+                return true;
+            }
+
+            bool hasLetter = plateNumber.Any(char.IsLetter);
+            bool hasNumber = plateNumber.Any(char.IsDigit);
+
+            return hasLetter && hasNumber;
         }
 
 
